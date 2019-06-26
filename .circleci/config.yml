@@ -46,7 +46,6 @@ terraform_init: &terraform_init
     name: terraform init
     command: |
       source $BASH_ENV
-      cd environments/$TERRAFORM_ENVIRONMENT
       terraform init
 
 apply_job: &apply_job
@@ -61,8 +60,7 @@ apply_job: &apply_job
         name: terraform apply 
         command: |
           source $BASH_ENV
-          cd environments/$TERRAFORM_ENVIRONMENT
-          terraform apply --auto-approve ../../terraform.plan -var-file=variables.tfvars
+          terraform apply --auto-approve terraform.plan -var-file=variables.tfvars
 
 jobs:
 
@@ -75,7 +73,6 @@ jobs:
           name: terraform fmt
           command: |
             source $BASH_ENV
-            cd environments/$TERRAFORM_ENVIRONMENT
 
             if [ $(terraform fmt | grep -v .terraform | tee fmt_result.txt | wc -l) -gt 0 ]; then
               echo "Format of this terraform files is not appropiate:"
@@ -102,8 +99,7 @@ jobs:
           name: terraform plan
           command: |
             source $BASH_ENV
-            cd environments/$TERRAFORM_ENVIRONMENT
-            terraform plan -out=../../terraform.plan -var-file=variables.tfvars
+            terraform plan -out=terraform.plan -var-file=variables.tfvars
       - persist_to_workspace:
           root: *working_directory
           paths:
